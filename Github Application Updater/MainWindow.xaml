@@ -5,8 +5,66 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Github_Application_Updater"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="650" Width="1000" WindowStartupLocation="CenterScreen">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200px" MinWidth="150px" MaxWidth="300px"/>
+            <ColumnDefinition Width="100*" MinWidth="200px"/>
+        </Grid.ColumnDefinitions>
+
+        <GridSplitter Panel.ZIndex="1" Grid.Column="1" Grid.RowSpan="100" HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="Black" Width="3"/>
+
+        <!--Selector-->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50px"/>
+                <RowDefinition Height="40px"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!--Add-->
+            <Grid Grid.Row="0" Background="DarkGray">
+                <TextBlock x:Name="Add" Background="{x:Null}" HorizontalAlignment="Left" Width="46" Margin="0,24,0,0" Foreground="Black" MouseEnter="Add_MouseEnter" MouseLeave="Add_MouseLeave">
+                    <StackPanel Orientation="Horizontal">
+                        <Viewbox>
+                            <Path x:Name="AddPlus"  Fill="#000000">
+                                <Path.Data>
+                                    <PathGeometry Figures="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" FillRule="NonZero"/>
+                                </Path.Data>
+                            </Path>
+                        </Viewbox>
+                        <TextBlock Text="6" FontFamily="Marlett" FontSize="20"/>
+                    </StackPanel>
+                </TextBlock>
+            </Grid>
+            
+            <!--Filter-->
+            <Grid Grid.Row="1" Background="Gray">
+                
+            </Grid>
+            
+            <!--Applications-->
+            <Grid Grid.Row="2" Background="DimGray">
+                
+            </Grid>
+        </Grid>
         
+        <!--Desc And Info-->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50px"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            
+            <!--Header-->
+            <Grid Grid.Row="0" Background="SlateGray">
+                
+            </Grid>
+            
+            <!--Content-->
+            <Grid Grid.Row="1" Background="DarkSlateGray">
+                
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
