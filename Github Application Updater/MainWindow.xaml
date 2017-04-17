@@ -9,23 +9,23 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200px" MinWidth="150px" MaxWidth="300px"/>
-            <ColumnDefinition Width="100*" MinWidth="200px"/>
+            <ColumnDefinition Width="*" MinWidth="200px"/>
         </Grid.ColumnDefinitions>
 
-        <GridSplitter Panel.ZIndex="1" Grid.Column="1" Grid.RowSpan="100" HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="Black" Width="3"/>
+        <GridSplitter Panel.ZIndex="1" Grid.Column="1" Grid.RowSpan="100" HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="Black" Width="3" SizeChanged="GridSplitter_SizeChanged"/>
 
         <!--Selector-->
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50px"/>
+                <RowDefinition Height="40px"/>
                 <RowDefinition Height="40px"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
             <!--Add-->
-            <Grid Grid.Row="0" Background="DarkGray">
-                <TextBlock x:Name="Add" Background="{x:Null}" HorizontalAlignment="Left" Width="46" Margin="0,24,0,0" Foreground="Black" MouseEnter="Add_MouseEnter" MouseLeave="Add_MouseLeave">
-                    <StackPanel Orientation="Horizontal">
+            <Grid Grid.Row="0">
+                <TextBlock x:Name="Add" Background="{x:Null}" HorizontalAlignment="Left" Width="30" Height="15" Margin="10,20,0,5" Foreground="Black" MouseEnter="Add_MouseEnter" MouseLeave="Add_MouseLeave" MouseDown="Add_MouseDown">
+                    <StackPanel Orientation="Horizontal" Width="30">
                         <Viewbox>
                             <Path x:Name="AddPlus"  Fill="#000000">
                                 <Path.Data>
@@ -33,37 +33,43 @@
                                 </Path.Data>
                             </Path>
                         </Viewbox>
-                        <TextBlock Text="6" FontFamily="Marlett" FontSize="20"/>
+                        <TextBlock Text="6" FontFamily="Marlett" FontSize="15"/>
                     </StackPanel>
                 </TextBlock>
             </Grid>
-            
+
             <!--Filter-->
-            <Grid Grid.Row="1" Background="Gray">
-                
+            <Grid Grid.Row="1">
+                <TextBox x:Name="Search" Margin="10,10,30,10" Text="Filter Applications" Foreground="#FF999999" GotFocus="SearchRemoveText" GotKeyboardFocus="SearchRemoveText" LostFocus="SearchAddText" LostKeyboardFocus="SearchAddText" KeyDown="Search_X" KeyUp="Search_X" MaxLines="1" BorderThickness="1,1,0,1" MouseEnter="Search_X" MouseLeave="Search_X"/>
+                <Button x:Name="ClearSearch" Height="20" Width="20" Margin="0,10,10,10" Background="White" BorderBrush="#FFABADB3" FontFamily="Marlett" Content="" BorderThickness="0,1,1,1" Click="ClearSearch_Click" HorizontalAlignment="Right"/>
             </Grid>
-            
+
             <!--Applications-->
-            <Grid Grid.Row="2" Background="DimGray">
-                
+            <Grid Grid.Row="2">
+                <ListBox HorizontalAlignment="Left" Height="539" VerticalAlignment="Top" Width="200" BorderThickness="0" Background="#00000000">
+                    <ListBoxItem BorderThickness="0" Height="30" FontSize="20" Padding="10, 0">Uno</ListBoxItem>
+                    <ListBoxItem BorderThickness="0" Height="30" FontSize="20" Padding="10, 0">Dux</ListBoxItem>
+                    <ListBoxItem BorderThickness="0" Height="30" FontSize="20" Padding="10, 0">Tri</ListBoxItem>
+                </ListBox>
+
             </Grid>
         </Grid>
-        
+
         <!--Desc And Info-->
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50px"/>
+                <RowDefinition Height="40px"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            
+
             <!--Header-->
             <Grid Grid.Row="0" Background="SlateGray">
-                
+
             </Grid>
-            
+
             <!--Content-->
             <Grid Grid.Row="1" Background="DarkSlateGray">
-                
+
             </Grid>
         </Grid>
     </Grid>

@@ -21,11 +21,11 @@ namespace Github_Application_Updater {
             InitializeComponent();
         }
 
-        public void Error(string text) => Add($"[{DateTime.Now.ToString("G")}] {text}", Brushes.Red);
+        public void Error(object text) => Add($"[{DateTime.Now.ToString("G")}] {text}", Brushes.Red);
 
-        public void Warn(string text) => Add($"[{DateTime.Now.ToString("G")}] {text}", Brushes.Goldenrod);
+        public void Warn(object text) => Add($"[{DateTime.Now.ToString("G")}] {text}", Brushes.Goldenrod);
 
-        public void Log(string text) => Add($"[{DateTime.Now.ToString("G")}] {text}", Brushes.Black);
+        public void Log(object text) => Add($"[{DateTime.Now.ToString("G")}] {text}", Brushes.Black);
 
         private void Add(string message, Brush color) { 
             Console.Items.Add(new TextBlock {
