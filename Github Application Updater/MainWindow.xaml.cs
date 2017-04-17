@@ -27,7 +27,7 @@ namespace Github_Application_Updater {
     /// </summary>
     public partial class MainWindow : Window {
 
-        DebugConsole Console;
+        public static DebugConsole Console;
         ConfigManager Config;
 
         public GithubApplications Applications;
@@ -64,18 +64,10 @@ namespace Github_Application_Updater {
         }
 
         public void Test() {
-            Repository r = new Repository();
-
-            r = JsonConvert.DeserializeObject<Repository>(Web.DownloadString("https://api.github.com/repos/DusterTheFirst/TestRepo"));
 
             Applications.Clear();
 
-            Applications.Add(new GithubApplication {
-                README = Web.DownloadString("https://raw.githubusercontent.com/DusterTheFirst/TestRepo/master/README.md"),
-                Repo = r
-            });
-
-            Console.Log(r + "");
+            Applications.Add(new GithubApplication("https://api.github.com/DusterTheFirst/AASS"));
         }
 
 

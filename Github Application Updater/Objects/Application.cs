@@ -5,11 +5,27 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using Github_Application_Updater.Util;
 
 namespace Github_Application_Updater.Objects {
     public class GithubApplication {
+
         public Repository Repo { get; set; }
         public string README { get; set; }
+
+        public GithubApplication(string URL) {
+            UriBuilder URI = new UriBuilder(URL) {
+                Host = "api.github.com"
+            };
+            URI.Path = "repos" + URI.Path;
+
+            MainWindow.Console.Log(URI.Uri.ToString());
+            Repo = JsonConvert.DeserializeObject<Repository>(Web.DownloadString(URI.Uri.ToString()));
+            README = Web.DownloadString($"https://raw.githubusercontent.com/{Repo.Owner.Name}/{Repo.Name}/master/README.md");
+        }
+
+        public GithubApplication() { }
+
     }
 
     public class Repository {
