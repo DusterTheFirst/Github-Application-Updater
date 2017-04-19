@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using Github_Application_Updater.Util;
+using Github_Application_Updater.Properties;
 
 namespace Github_Application_Updater.Objects {
     public class GithubApplication {
@@ -21,7 +22,15 @@ namespace Github_Application_Updater.Objects {
 
             MainWindow.Console.Log(URI.Uri.ToString());
             Repo = JsonConvert.DeserializeObject<Repository>(Web.DownloadString(URI.Uri.ToString()));
-            README = Web.DownloadString($"https://raw.githubusercontent.com/{Repo.Owner.Name}/{Repo.Name}/master/README.md");
+            try {
+                README = Web.DownloadString($"https://raw.githubusercontent.com/{Repo.Owner.Name}/{Repo.Name}/master/README.md");
+            } catch {
+                README = "# No README Provided";
+            }
+
+            //Convert README To HTML
+            README = Markdown.RenderGithubMarkdown(README);
+            README = $"<style>{Resources.github_markdown}</style><body oncontextmenu='return false'>{README}</body>";
         }
 
         public GithubApplication() { }

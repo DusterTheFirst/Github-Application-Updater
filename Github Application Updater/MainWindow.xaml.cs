@@ -16,10 +16,12 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Github_Application_Updater {
     /// <summary>
@@ -59,6 +61,11 @@ namespace Github_Application_Updater {
             Console.Warn("WARNING");
             Console.Log("LOG");
 
+            AppImage.Source = Imaging.CreateBitmapSourceFromHIcon(
+                                System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetEntryAssembly().ManifestModule.Name).Handle,
+                                Int32Rect.Empty,
+                                BitmapSizeOptions.FromEmptyOptions());
+
             Test();
 
         }
@@ -67,7 +74,9 @@ namespace Github_Application_Updater {
 
             Applications.Clear();
 
-            Applications.Add(new GithubApplication("https://api.github.com/DusterTheFirst/AASS"));
+            Applications.Add(new GithubApplication("https://api.github.com/DusterTheFirst/TestRepo"));
+
+            README.DoNavigateToString(Applications[0].README);
         }
 
 
@@ -79,12 +88,12 @@ namespace Github_Application_Updater {
         }
 
         private void Add_MouseEnter(object sender, MouseEventArgs e) {
-            Brush hover = new SolidColorBrush(Color.FromRgb(100, 100, 100));
+            Brush hover = new SolidColorBrush(Color.FromRgb(200, 200, 200));
             Add.Foreground = hover;
             AddPlus.Fill = hover;
         }
         private void Add_MouseLeave(object sender, MouseEventArgs e) {
-            Brush hover = Brushes.Black;
+            Brush hover = Brushes.White;
             Add.Foreground = hover;
             AddPlus.Fill = hover;
         }
@@ -136,9 +145,73 @@ namespace Github_Application_Updater {
             SearchAddText(null, null);
         }
 
-        private void GridSplitter_SizeChanged(object sender, SizeChangedEventArgs e) {
+        private void HideREADME_Click(object sender, RoutedEventArgs e) {
+            if (READMECol.Width.Value == 0) {
+                READMECol.MinWidth = 350;
+                READMECol.Width = new GridLength(400);
+            } else {
+                READMECol.MinWidth = 0;
+                READMECol.Width = new GridLength(0);
+            }
+        }
+        private void HideREADME_MouseEnter(object sender, MouseEventArgs e) {
+            Brush hover = new SolidColorBrush(Color.FromRgb(200, 200, 200));
+            HideREADME.Foreground = hover;
+        }
+        private void HideREADME_MouseLeave(object sender, MouseEventArgs e) {
+            Brush hover = Brushes.White;
+            HideREADME.Foreground = hover;
+        }
 
+        private void DragWindow(object sender, MouseButtonEventArgs e) {
+            DragMove();
+        }
+
+        private void CloseWindow(object sender, MouseButtonEventArgs e) {
+            Close();
+        }
+        private void CloseButton_MouseEnter(object sender, MouseEventArgs e) {
+            CloseButton.Background = Brushes.DarkRed;
+        }
+        private void CloseButton_MouseLeave(object sender, MouseEventArgs e) {
+            CloseButton.Background = Brushes.Transparent;
+        }
+
+        private void MaxRestWindow(object sender, MouseButtonEventArgs e) {
+            if (WindowState == WindowState.Maximized) {
+                MaxRestButton.Text = "1";
+                MaxRestButton.ToolTip = "Maximise";
+                WindowState = WindowState.Normal;
+            } else {
+                MaxRestButton.Text = "2";
+                MaxRestButton.ToolTip = "Restore Down";
+                WindowState = WindowState.Maximized;
+            }
+        }
+        private void MaxRestButton_MouseEnter(object sender, MouseEventArgs e) {
+            MaxRestButton.Background = new SolidColorBrush(Color.FromArgb(75, 100, 100, 100));
+        }
+        private void MaxRestButton_MouseLeave(object sender, MouseEventArgs e) {
+            MaxRestButton.Background = Brushes.Transparent;
+        }
+
+        private void MinWindow(object sender, MouseButtonEventArgs e) {
+            WindowState = WindowState.Minimized;
+        }
+        private void MinButton_MouseEnter(object sender, MouseEventArgs e) {
+            MinButton.Background = new SolidColorBrush(Color.FromArgb(75, 100, 100, 100));
+        }
+        private void MinButton_MouseLeave(object sender, MouseEventArgs e) {
+            MinButton.Background = Brushes.Transparent;
+        }
+
+        private void Window_Deactivated(object sender, EventArgs e) {
+            Foreground = Brushes.Gray;
+        }
+        private void Window_Activated(object sender, EventArgs e) {
+            Foreground = Brushes.White;
         }
         #endregion
+
     }
 }
