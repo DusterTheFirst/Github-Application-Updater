@@ -21,6 +21,7 @@ namespace Github_Application_Updater.Objects {
             URI.Path = "repos" + URI.Path;
 
             MainWindow.Console.Log(URI.Uri.ToString());
+
             Repo = JsonConvert.DeserializeObject<Repository>(Web.DownloadString(URI.Uri.ToString()));
             try {
                 README = Web.DownloadString($"https://raw.githubusercontent.com/{Repo.Owner.Name}/{Repo.Name}/master/README.md");
@@ -52,6 +53,17 @@ namespace Github_Application_Updater.Objects {
         public DateTime LastUpdated { get; set; }
         [JsonProperty("owner")]
         public GithubUser Owner { get; set; }
+        [JsonProperty("license")]
+        public GithubLicense License { get; set; }
+    }
+
+    public class GithubLicense {
+        [JsonProperty("key")]
+        public string Key { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("url")]
+        public string URL { get; set; }
     }
 
     public class GithubUser {

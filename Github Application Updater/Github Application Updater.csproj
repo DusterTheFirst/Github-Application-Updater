@@ -108,6 +108,7 @@
     </ApplicationDefinition>
     <Compile Include="Util\Extentions.cs" />
     <Compile Include="Util\Markdown.cs" />
+    <Compile Include="Util\RateLimit.cs" />
     <Compile Include="Util\Web.cs" />
     <Page Include="Debug Console.xaml">
       <SubType>Designer</SubType>
@@ -164,6 +165,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\gear.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

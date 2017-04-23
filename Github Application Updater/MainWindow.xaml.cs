@@ -40,7 +40,7 @@ namespace Github_Application_Updater {
             Console = new DebugConsole();
 
             Config = new ConfigManager(Console);
-            
+
             Config.AfterConfigLoaded += (sender, ConfigFile) => {
                 Applications = ConfigFile.Applications ?? new GithubApplications();
             };
@@ -60,6 +60,8 @@ namespace Github_Application_Updater {
             Console.Error("ERROR");
             Console.Warn("WARNING");
             Console.Log("LOG");
+            RateLimit RateLimit = new RateLimit(true);
+            Console.Warn($"Only {RateLimit.Resources["core"].Remaining} API Calls Remaining Until {RateLimit.UnixTimeStampToDateTime(RateLimit.Resources["core"].Reset)}");
 
             AppImage.Source = Imaging.CreateBitmapSourceFromHIcon(
                                 System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetEntryAssembly().ManifestModule.Name).Handle,
@@ -72,9 +74,10 @@ namespace Github_Application_Updater {
 
         public void Test() {
 
-            Applications.Clear();
+            //Applications.Clear();
 
-            Applications.Add(new GithubApplication("https://api.github.com/DusterTheFirst/TestRepo"));
+            //Only Update When Needed, Ratlimits exist
+            //Applications.Add(new GithubApplication("https://api.github.com/DusterTheFirst/TestRepo"));
 
             README.DoNavigateToString(Applications[0].README);
         }
@@ -87,18 +90,31 @@ namespace Github_Application_Updater {
             Config.Save();
         }
 
-        private void Add_MouseEnter(object sender, MouseEventArgs e) {
-            Brush hover = new SolidColorBrush(Color.FromRgb(200, 200, 200));
-            Add.Foreground = hover;
-            AddPlus.Fill = hover;
+        private void Add_Mouse(object sender, MouseButtonEventArgs e) {
+            if(AddURL.Visibility == Visibility.Collapsed) {
+                AddURL.Visibility = Visibility.Visible;
+                Keyboard.ClearFocus();
+                AddPlus.LayoutTransform = new RotateTransform(45, .5, .5);
+                Add.HorizontalAlignment = HorizontalAlignment.Right;
+            } else {
+                AddURL.Visibility = Visibility.Collapsed;
+                Keyboard.ClearFocus();
+                AddPlus.LayoutTransform = new RotateTransform(0, .5, .5);
+                Add.HorizontalAlignment = HorizontalAlignment.Left;
+            }
         }
-        private void Add_MouseLeave(object sender, MouseEventArgs e) {
-            Brush hover = Brushes.White;
-            Add.Foreground = hover;
-            AddPlus.Fill = hover;
+
+        public void AddURLRemoveText(object sender, EventArgs e) {
+            if (AddURL.Text == "Github URL") {
+                AddURL.Text = "";
+            }
+            AddURL.Foreground = Brushes.Black;
         }
-        private void Add_MouseDown(object sender, MouseButtonEventArgs e) {
-            Keyboard.ClearFocus();
+        public void AddURLAddText(object sender, EventArgs e) {
+            if (String.IsNullOrWhiteSpace(AddURL.Text)) {
+                AddURL.Text = "Github URL";
+            }
+            AddURL.Foreground = new SolidColorBrush(Color.FromRgb(153, 153, 153));
         }
 
         public void SearchRemoveText(object sender, EventArgs e) {
@@ -154,17 +170,10 @@ namespace Github_Application_Updater {
                 READMECol.Width = new GridLength(0);
             }
         }
-        private void HideREADME_MouseEnter(object sender, MouseEventArgs e) {
-            Brush hover = new SolidColorBrush(Color.FromRgb(200, 200, 200));
-            HideREADME.Foreground = hover;
-        }
-        private void HideREADME_MouseLeave(object sender, MouseEventArgs e) {
-            Brush hover = Brushes.White;
-            HideREADME.Foreground = hover;
-        }
 
         private void DragWindow(object sender, MouseButtonEventArgs e) {
-            DragMove();
+            if (e.LeftButton == MouseButtonState.Pressed)
+                DragMove();
         }
 
         private void CloseWindow(object sender, MouseButtonEventArgs e) {
@@ -211,7 +220,86 @@ namespace Github_Application_Updater {
         private void Window_Activated(object sender, EventArgs e) {
             Foreground = Brushes.White;
         }
+        
+        bool ResizeInProcess = false;
+        private void Resize_Init(object sender, MouseButtonEventArgs e) {
+            if (sender is Rectangle senderRect) {
+                ResizeInProcess = true;
+                senderRect.CaptureMouse();
+            }
+        }
+        private void Resize_End(object sender, MouseButtonEventArgs e) {
+            if (sender is Rectangle senderRect) {
+                ResizeInProcess = false; ;
+                senderRect.ReleaseMouseCapture();
+            }
+        }
+        private void Resizeing_Form(object sender, MouseEventArgs e) {
+            if (ResizeInProcess) {
+                Rectangle senderRect = sender as Rectangle;
+                Window mainWindow = senderRect.Tag as Window;
+                if (senderRect != null) {
+                    double startwidth = e.GetPosition(mainWindow).X;
+                    double startheight = e.GetPosition(mainWindow).Y;
+
+                    double width = e.GetPosition(mainWindow).X;
+                    double height = e.GetPosition(mainWindow).Y;
+                    senderRect.CaptureMouse();
+                    if (senderRect.Name.ToLower().Contains("right")) {
+                        width += 1;
+                        if (width > 1000) {
+                            mainWindow.Width = width;
+                        } else {
+                            mainWindow.Width = width;
+                        }
+                    }
+                    if (senderRect.Name.ToLower().Contains("left")) {
+                        width -= 1;
+                        double newwidth = mainWindow.Width - width;
+                        if (newwidth > 1000) {
+                            mainWindow.Left += width;
+                            mainWindow.Width = newwidth;
+                        } else {
+                            //mainWindow.Left = startwidth;
+                            mainWindow.Width = 1000;
+                        }
+                    }
+                    if (senderRect.Name.ToLower().Contains("bottom")) {
+                        height += 1;
+                        if (height > 650) {
+                            mainWindow.Height = height;
+                        } else {
+                            mainWindow.Height = 650;
+                        }
+                    }
+                    if (senderRect.Name.ToLower().Contains("top")) {
+                        height -= 1;
+                        double newheight = mainWindow.Height - height;
+                        if (newheight > 650) {
+                            mainWindow.Top += height;
+                            mainWindow.Height = newheight;
+                        } else {
+                            mainWindow.Height = 650;
+                            //mainWindow.Top = startheight;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Refresh(object sender, RoutedEventArgs e) {
+
+        }
+
+        private void Search_KeyDown(object sender, KeyEventArgs e) {
+            Search_X();
+        }
+
+        private void Search_KeyUp(object sender, KeyEventArgs e) {
+            Search_X();
+        }
         #endregion
+
 
     }
 }
