@@ -32,7 +32,7 @@ namespace Github_Application_Updater {
         public static DebugConsole Console;
         ConfigManager Config;
 
-        public GithubApplications Applications;
+        public List<GithubApplication> Applications;
 
         public MainWindow() {
             InitializeComponent();
@@ -42,7 +42,7 @@ namespace Github_Application_Updater {
             Config = new ConfigManager(Console);
 
             Config.AfterConfigLoaded += (sender, ConfigFile) => {
-                Applications = ConfigFile.Applications ?? new GithubApplications();
+                Applications = ConfigFile.Applications ?? new List<GithubApplication>();
             };
 
             Config.BeforeConfigSaved += (sender, ConfigFile) => {
@@ -68,6 +68,11 @@ namespace Github_Application_Updater {
                                 Int32Rect.Empty,
                                 BitmapSizeOptions.FromEmptyOptions());
 
+            FillApps();
+
+            ApplicationList.SelectedIndex = 0;
+            ApplicationList.Focus();
+
             Test();
 
         }
@@ -78,8 +83,12 @@ namespace Github_Application_Updater {
 
             //Only Update When Needed, Ratlimits exist
             //Applications.Add(new GithubApplication("https://api.github.com/DusterTheFirst/TestRepo"));
+            //Applications.Add(new GithubApplication("https://api.github.com/DusterTheFirst/Github-Application-Updater"));
+            //Applications.Add(new GithubApplication("https://api.github.com/DusterTheFirst/SMOL"));
+            //Applications.Add(new GithubApplication("https://api.github.com/DusterTheFirst/dusterthefirst.github.io"));
 
-            README.DoNavigateToString(Applications[0].README);
+
+            //README.DoNavigateToString(Applications[0].README);
         }
 
 
@@ -91,7 +100,7 @@ namespace Github_Application_Updater {
         }
 
         private void Add_Mouse(object sender, MouseButtonEventArgs e) {
-            if(AddURL.Visibility == Visibility.Collapsed) {
+            if (AddURL.Visibility == Visibility.Collapsed) {
                 AddURL.Visibility = Visibility.Visible;
                 Keyboard.ClearFocus();
                 AddPlus.LayoutTransform = new RotateTransform(45, .5, .5);
@@ -159,6 +168,7 @@ namespace Github_Application_Updater {
         private void ClearSearch_Click(object sender, RoutedEventArgs e) {
             Search.Text = "";
             SearchAddText(null, null);
+            FillApps();
         }
 
         private void HideREADME_Click(object sender, RoutedEventArgs e) {
@@ -220,7 +230,7 @@ namespace Github_Application_Updater {
         private void Window_Activated(object sender, EventArgs e) {
             Foreground = Brushes.White;
         }
-        
+
         bool ResizeInProcess = false;
         private void Resize_Init(object sender, MouseButtonEventArgs e) {
             if (sender is Rectangle senderRect) {
@@ -288,18 +298,73 @@ namespace Github_Application_Updater {
         }
 
         private void Refresh(object sender, RoutedEventArgs e) {
+            Config.Save();
+            Config.Load();
 
+            FillApps(Search.Text.Replace("Filter Applications", "") ?? "");
         }
 
-        private void Search_KeyDown(object sender, KeyEventArgs e) {
+        private void Search_TextChanged(object sender, TextChangedEventArgs e) {
+            if (Applications == null) return;
+
+            FillApps(Search.Text.Replace("Filter Applications", "") ?? "");
+
             Search_X();
         }
 
-        private void Search_KeyUp(object sender, KeyEventArgs e) {
-            Search_X();
+        private void ApplicationList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            GithubApplication selected = Applications.FirstOrDefault(x => x.Repo.Name == (ApplicationList.SelectedItem as ListBoxItem).Content as string);
+            if (selected == null) return;
+            README.DoNavigateToString(selected.README);
+
+            SelectedAuthor.Text = selected.Repo.Owner.Name;
+            SelectedDescription.Text = selected.Repo.Description;
+            SelectedLicense.NavigateUri = new Uri(selected.Repo.License?.URL ?? "https://www.google.com");
+            SelectedLicense.Inlines.Clear();
+            SelectedLicense.Inlines.Add(selected.Repo.License?.Name ?? "No License");
+            SelectedUpdate.Text = selected.Repo.LastUpdated.ToString("D");
+        }
+
+        private void NoNav(object sender, NavigatingCancelEventArgs e) {
+            if (Extentions.navigating) return;
+            e.Cancel = true;
+            try {
+                System.Diagnostics.Process.Start(e.Uri.ToString());
+            } catch {
+                e.Cancel = false;
+            }
+        }
+
+        private void Link_Click(object sender, RoutedEventArgs e) {
+            System.Diagnostics.Process.Start((sender as Hyperlink).NavigateUri.ToString());
         }
         #endregion
 
+        private void FillApps(string query = "") {
+            Applications = Applications.Distinct() as List<GithubApplication>;
 
+            IEnumerable<GithubApplication> filtered = Applications.Where(x => x.Repo.Name.ToLower().Contains(query.ToLower()));
+
+            ApplicationList.Items.Clear();
+            if ((filtered.ToList()).Count == 0) {
+                ApplicationList.Items.Add(new ListBoxItem() {
+                    BorderThickness = new Thickness(0),
+                    Height = 30,
+                    FontSize = 15,
+                    Padding = new Thickness(10, 0, 10, 0),
+                    IsEnabled = false,
+                    Content = "No Applications Found"
+                });
+            }
+            foreach (GithubApplication a in filtered) {
+                ApplicationList.Items.Add(new ListBoxItem() {
+                    BorderThickness = new Thickness(0),
+                    Height = 30,
+                    FontSize = 15,
+                    Padding = new Thickness(10, 0, 10, 0),
+                    Content = a.Repo.Name
+                });
+            }
+        }
     }
 }

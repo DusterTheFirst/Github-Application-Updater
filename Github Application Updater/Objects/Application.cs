@@ -58,8 +58,6 @@ namespace Github_Application_Updater.Objects {
     }
 
     public class GithubLicense {
-        [JsonProperty("key")]
-        public string Key { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("url")]
@@ -74,6 +72,4 @@ namespace Github_Application_Updater.Objects {
         [JsonProperty("avatar_url")]
         public string Avatar_URL { get; set; }
     }
-
-    public class GithubApplications : Collection<GithubApplication> { }
 }

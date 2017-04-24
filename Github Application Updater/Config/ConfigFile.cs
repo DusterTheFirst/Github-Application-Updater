@@ -7,6 +7,6 @@ using Github_Application_Updater.Objects;
 
 namespace Github_Application_Updater.Config {
     public class ConfigFile {
-        public GithubApplications Applications { get; set; }
+        public List<GithubApplication> Applications { get; set; }
     }
 }

@@ -31,7 +31,7 @@ namespace Github_Application_Updater.Config {
                 string file = JsonConvert.SerializeObject(new ConfigFile(), Formatting.Indented);
                 File.WriteAllText(path, file);
             }
-            Config = JsonConvert.DeserializeObject<ConfigFile>(File.ReadAllText(path));
+            Config = JsonConvert.DeserializeObject<ConfigFile>(File.ReadAllText(path)) ?? new ConfigFile();
         }
 
         public void Save() => Save("config.json");
