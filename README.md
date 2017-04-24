@@ -1,5 +1,6 @@
 # Github-Application-Updater
 Utility - An Application Downloader And Updater For Github Releases
+## THESE ARE ALL OLD PICTURES, THE THING HAS CHANGED
 
 # There It Is, In All Its Glory
 ![Image](http://i.imgur.com/NC57YUb.png)
