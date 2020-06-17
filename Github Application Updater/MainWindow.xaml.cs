@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -43,6 +44,7 @@ namespace Github_Application_Updater {
 
             Config.AfterConfigLoaded += (sender, ConfigFile) => {
                 Applications = ConfigFile.Applications ?? new List<GithubApplication>();
+                FillApps();
             };
 
             Config.BeforeConfigSaved += (sender, ConfigFile) => {
@@ -68,7 +70,6 @@ namespace Github_Application_Updater {
                                 Int32Rect.Empty,
                                 BitmapSizeOptions.FromEmptyOptions());
 
-            FillApps();
 
             ApplicationList.SelectedIndex = 0;
             ApplicationList.Focus();
@@ -313,7 +314,7 @@ namespace Github_Application_Updater {
         }
 
         private void ApplicationList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            GithubApplication selected = Applications.FirstOrDefault(x => x.Repo.Name == (ApplicationList.SelectedItem as ListBoxItem).Content as string);
+            GithubApplication selected = Applications.FirstOrDefault(x => x.Repo.Name == (ApplicationList.SelectedItem as ListBoxItem)?.Content as string);
             if (selected == null) return;
             README.DoNavigateToString(selected.README);
 
@@ -329,42 +330,43 @@ namespace Github_Application_Updater {
             if (Extentions.navigating) return;
             e.Cancel = true;
             try {
-                System.Diagnostics.Process.Start(e.Uri.ToString());
+                Process.Start(e.Uri.ToString());
             } catch {
                 e.Cancel = false;
             }
         }
 
         private void Link_Click(object sender, RoutedEventArgs e) {
-            System.Diagnostics.Process.Start((sender as Hyperlink).NavigateUri.ToString());
+            Process.Start((sender as Hyperlink).NavigateUri.ToString());
         }
         #endregion
 
         private void FillApps(string query = "") {
-            Applications = Applications.Distinct() as List<GithubApplication>;
 
             IEnumerable<GithubApplication> filtered = Applications.Where(x => x.Repo.Name.ToLower().Contains(query.ToLower()));
 
-            ApplicationList.Items.Clear();
-            if ((filtered.ToList()).Count == 0) {
-                ApplicationList.Items.Add(new ListBoxItem() {
-                    BorderThickness = new Thickness(0),
-                    Height = 30,
-                    FontSize = 15,
-                    Padding = new Thickness(10, 0, 10, 0),
-                    IsEnabled = false,
-                    Content = "No Applications Found"
-                });
-            }
-            foreach (GithubApplication a in filtered) {
-                ApplicationList.Items.Add(new ListBoxItem() {
-                    BorderThickness = new Thickness(0),
-                    Height = 30,
-                    FontSize = 15,
-                    Padding = new Thickness(10, 0, 10, 0),
-                    Content = a.Repo.Name
-                });
-            }
+            Dispatcher.Invoke(() => {
+                ApplicationList.Items.Clear();
+                if ((filtered.ToList()).Count == 0) {
+                    ApplicationList.Items.Add(new ListBoxItem() {
+                        BorderThickness = new Thickness(0),
+                        Height = 30,
+                        FontSize = 15,
+                        Padding = new Thickness(10, 0, 10, 0),
+                        IsEnabled = false,
+                        Content = "No Applications Found"
+                    });
+                }
+                foreach (GithubApplication a in filtered) {
+                    ApplicationList.Items.Add(new ListBoxItem() {
+                        BorderThickness = new Thickness(0),
+                        Height = 30,
+                        FontSize = 15,
+                        Padding = new Thickness(10, 0, 10, 0),
+                        Content = a.Repo.Name
+                    });
+                }
+            });
         }
     }
 }
